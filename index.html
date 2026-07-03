@@ -1,32 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>验证码发送页</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>验证码发送</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f0f2f5; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 80%; max-width: 300px; }
+        input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 6px; }
+    </style>
 </head>
 <body>
-    <input type="text" id="phone" placeholder="请输入手机号">
-    <button onclick="sendRequest()">点击提交</button>
+    <div class="card">
+        <h3>发送验证码</h3>
+        <input type="text" id="phone" placeholder="输入手机号">
+        <button id="btn" onclick="sendSMS()">点击提交</button>
+    </div>
 
     <script>
-    async function sendRequest() {
-        const phone = document.getElementById('phone').value;
-        const url = "https://eolink.o.apispace.com/konghao/batch-ucheck";
-        
-        // 注意：X-APISpace-Token 必须在服务器端添加以防泄露
-        // 这里仅供演示，请将 YOUR_TOKEN 替换为你自己的 Token
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                "X-APISpace-Token": "你的Token填在这里",
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: "mobiles=" + phone + "&type=0"
-        });
-        
-        const data = await response.json();
-        alert("返回结果: " + JSON.stringify(data));
-    }
+        async function sendSMS() {
+            const phone = document.getElementById('phone').value;
+            const btn = document.getElementById('btn');
+            
+            if(!phone) return alert('请输入手机号');
+            
+            btn.disabled = true;
+            btn.innerText = '发送中...';
+
+            try {
+                // 这是直接调用接口的请求
+                const response = await fetch("https://eolink.o.apispace.com/konghao/batch-ucheck", {
+                    method: 'POST',
+                    headers: {
+                        "X-APISpace-Token": "YOUR_TOKEN_HERE", // <-- 这里填入你的 Token
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: "mobiles=" + phone + "&type=0"
+                });
+                
+                const result = await response.json();
+                alert('接口响应: ' + JSON.stringify(result));
+            } catch(e) {
+                alert('发送失败，请检查网络');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = '点击提交';
+            }
+        }
     </script>
 </body>
 </html>
