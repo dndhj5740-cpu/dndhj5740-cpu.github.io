@@ -1,108 +1,32 @@
-
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>我的专属极简主页</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
-        }
-        body {
-            background: linear-gradient(135deg, #e0e5ec 0%, #c8d0e7 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 30px 24px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            text-align: center;
-        }
-        h1 {
-            color: #1d1d1f;
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-        p {
-            color: #86868b;
-            font-size: 14px;
-            margin-bottom: 28px;
-        }
-        .input-group {
-            margin-bottom: 16px;
-            text-align: left;
-        }
-        label {
-            display: block;
-            color: #515154;
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 6px;
-            padding-left: 4px;
-        }
-        input {
-            width: 100%;
-            padding: 14px 16px;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            background: rgba(255, 255, 255, 0.5);
-            font-size: 16px;
-            color: #1d1d1f;
-            transition: all 0.3s ease;
-            outline: none;
-            -webkit-appearance: none;
-        }
-        input:focus {
-            border-color: #0071e3;
-            background: #ffffff;
-            box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
-        }
-        button {
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            border: none;
-            background: #0071e3;
-            color: #ffffff;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
-            -webkit-tap-highlight-color: transparent;
-        }
-        button:active {
-            background: #005bb5;
-            transform: scale(0.98);
-        }
-    </style>
+    <title>验证码发送页</title>
 </head>
 <body>
+    <input type="text" id="phone" placeholder="请输入手机号">
+    <button onclick="sendRequest()">点击提交</button>
 
-    <div class="container">
-        <h1>欢迎来到我的新网站</h1>
-        <p>这是一个完全由手机部署的自定义页面</p>
+    <script>
+    async function sendRequest() {
+        const phone = document.getElementById('phone').value;
+        const url = "https://eolink.o.apispace.com/konghao/batch-ucheck";
         
-        <div class="input-group">
-            <label for="username">输入内容</label>
-            <input type="text" id="username" placeholder="在这里输入点什么...">
-        </div>
+        // 注意：X-APISpace-Token 必须在服务器端添加以防泄露
+        // 这里仅供演示，请将 YOUR_TOKEN 替换为你自己的 Token
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                "X-APISpace-Token": "你的Token填在这里",
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "mobiles=" + phone + "&type=0"
+        });
         
-        <button onclick="alert('触发成功！')">点击提交</button>
-    </div>
-
+        const data = await response.json();
+        alert("返回结果: " + JSON.stringify(data));
+    }
+    </script>
 </body>
+</html>
