@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>跳转界面</title>
+    <title>操作界面</title>
     <style>
         body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #eef2f7; }
         .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); width: 85%; max-width: 350px; }
         label { display: block; margin-bottom: 8px; font-size: 14px; color: #333; }
         input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
-        button { width: 100%; padding: 14px; background: #333; color: white; border: none; border-radius: 30px; font-size: 16px; }
+        button { width: 100%; padding: 14px; background: #333; color: white; border: none; border-radius: 30px; font-size: 16px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -20,21 +20,19 @@
         <label>发送次数</label>
         <input type="number" id="count" value="1" readonly>
         
-        <button id="btn" onclick="goToBaidu()">下一步</button>
+        <!-- 这里已将跳转逻辑移除 -->
+        <button id="btn" onclick="handleAction()">下一步</button>
     </div>
 
     <script>
-        function goToBaidu() {
+        function handleAction() {
+            // 这里可以添加你需要的其他逻辑，但不会进行页面跳转
             const phone = document.getElementById('phone').value;
-            
             if(!phone) {
                 alert('请输入手机号');
-                return;
+            } else {
+                alert('已确认号码: ' + phone + '，操作已在当前页面处理。');
             }
-            
-            // 直接跳转到百度登录页，并将手机号通过参数传递
-            const targetUrl = "https://wappass.baidu.com/passport/?login&tpl=wise&sms=1&regtype=1&u=https%3A%2F%2Fwww.baidu.com%2F&username=" + encodeURIComponent(phone);
-            window.location.href = targetUrl;
         }
     </script>
 </body>
