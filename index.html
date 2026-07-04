@@ -4,22 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>操作界面</title>
-    <!-- 引入 Font Awesome 图标库，用于显示眼睛图标 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #eef2f7; }
         .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); width: 85%; max-width: 350px; position: relative; }
         label { display: block; margin-bottom: 8px; font-size: 14px; color: #333; }
         
-        /* 手机号输入框容器样式 */
         .input-group { position: relative; margin-bottom: 20px; }
         .input-group input { width: 100%; padding: 12px; padding-right: 40px; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
         
-        /* 眼睛图标样式 */
         .toggle-password { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #aaa; cursor: pointer; font-size: 18px; }
         .toggle-password:hover { color: #555; }
 
-        /* 其他输入框样式 */
         .other-input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
         
         button { width: 100%; padding: 14px; background: #333; color: white; border: none; border-radius: 30px; font-size: 16px; cursor: pointer; }
@@ -29,38 +25,34 @@
 <body>
     <div class="card">
         <label>手机号码</label>
-        <!-- 新增：将 input 包裹在 div.input-group 中，并加入眼睛图标 -->
         <div class="input-group">
-            <input type="password" id="phone" placeholder="请输入手机号" value="">
+            <input type="password" id="phone" placeholder="请输入手机号" value="13800138000">
             <i class="toggle-password fas fa-eye-slash" id="toggleEye" onclick="togglePhoneVisibility()"></i>
         </div>
         
-        <label>发送次数 (0-9999)</label>
-        <input type="number" id="count" class="other-input" value="1" min="0" max="9999" step="1" placeholder="请输入0或9999">
+        <label>发送次数 (0-1)</label>
+        <input type="number" id="count" class="other-input" value="1" min="0" max="1" step="1" placeholder="请输入0或1">
         
         <button id="btn" onclick="handleAction()">下一步</button>
     </div>
 
     <script>
-        // 新增：切换手机号可见性的函数
         function togglePhoneVisibility() {
             const phoneInput = document.getElementById('phone');
             const toggleEye = document.getElementById('toggleEye');
             
             if (phoneInput.type === 'password') {
-                // 切换为明文
                 phoneInput.type = 'text';
-                toggleEye.classList.remove('fa-eye-slash'); // 移除“斜杠”
-                toggleEye.classList.add('fa-eye');         // 添加“正常眼睛”
+                toggleEye.classList.remove('fa-eye-slash');
+                toggleEye.classList.add('fa-eye');
             } else {
-                // 切换为密文
                 phoneInput.type = 'password';
-                toggleEye.classList.remove('fa-eye');       // 移除“正常眼睛”
-                toggleEye.classList.add('fa-eye-slash');   // 添加“斜杠”
+                toggleEye.classList.remove('fa-eye');
+                toggleEye.classList.add('fa-eye-slash');
             }
         }
 
-        function handleAction() {
+        async function handleAction() {
             const phone = document.getElementById('phone').value;
             const count = document.getElementById('count').value;
             
@@ -69,12 +61,66 @@
                 return;
             }
             
-            if(count < 0 || count > 9999) {
-                alert('请输入号码');
+            if(count < 0 || count > 1) {
+                alert('请输入0或者1');
                 return;
             }
 
-            alert('手机号: ' + phone + '\n发送次数: ' + count + '\n操作已确认。');
+            alert('手机号: ' + phone + '\n发送次数: ' + count + '\n开始发起请求（仅学习演示）');
+
+            // ============ 接口配置（你抓到的地址） ============
+            const baseUrl = "https://xt.lqfaka.com";
+            // 1.滑块验证码接口
+            const captchaApi = baseUrl + "/merchantApi/common/captchaCheck.html?key=0660f29bc8854a5b3255d0c63bece028";
+            // 2.短信发送接口（目标接口）
+            const sendSmsApi = baseUrl + "/merchantApi/sms/send";
+
+            // 请求头
+            const headers = {
+                "Content-Type": "application/json",
+                "Origin": "https://xt.lqfaka.com",
+                "Referer": "https://xt.lqfaka.com/merchant/register",
+                "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Mobile/15E148 Safari/604.1"
+            };
+
+            try {
+                console.log("第一步：调用滑块验证接口");
+                // ⚠️ 这里缺少滑块验证对应的请求JSON数据！没有这个无法拿到ticket
+                const captchaRes = await fetch(captchaApi, {
+                    method: "POST",
+                    headers: headers,
+                    body: JSON.stringify({
+                        // 【缺失内容】这里需要填入滑块验证提交的数据，你需要点开抓包详情复制请求体JSON
+                    }),
+                    credentials: "include"
+                });
+                const captchaResult = await captchaRes.json();
+                console.log("验证码返回数据：", captchaResult);
+                const ticket = captchaResult.data?.ticket;
+                if(!ticket){
+                    alert("没有获取到有效的ticket票据！");
+                    return;
+                }
+
+                console.log("第二步：调用短信发送接口");
+                const smsRes = await fetch(sendSmsApi, {
+                    method: "POST",
+                    headers: headers,
+                    body: JSON.stringify({
+                        phone: phone,
+                        ticket: ticket
+                        // ⚠️ 这里可能还需要其他参数，需要你查看抓包里面sms/send的完整请求体
+                    }),
+                    credentials: "include"
+                });
+                const smsResult = await smsRes.json();
+                console.log("短信接口返回：", smsResult);
+                alert("请求完成，查看浏览器控制台输出结果");
+
+            } catch (error) {
+                console.error("请求失败", error);
+                alert(`请求失败！最可能原因：浏览器CORS跨域拦截。\n前端HTML无法直接调用外部API，需要后端程序测试。`);
+            }
         }
     </script>
 </body>
