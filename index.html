@@ -4,35 +4,77 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>操作界面</title>
+    <!-- 引入 Font Awesome 图标库，用于显示眼睛图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #eef2f7; }
-        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); width: 85%; max-width: 350px; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); width: 85%; max-width: 350px; position: relative; }
         label { display: block; margin-bottom: 8px; font-size: 14px; color: #333; }
-        input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
+        
+        /* 手机号输入框容器样式 */
+        .input-group { position: relative; margin-bottom: 20px; }
+        .input-group input { width: 100%; padding: 12px; padding-right: 40px; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
+        
+        /* 眼睛图标样式 */
+        .toggle-password { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #aaa; cursor: pointer; font-size: 18px; }
+        .toggle-password:hover { color: #555; }
+
+        /* 其他输入框样式 */
+        .other-input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
+        
         button { width: 100%; padding: 14px; background: #333; color: white; border: none; border-radius: 30px; font-size: 16px; cursor: pointer; }
+        button:hover { background: #555; }
     </style>
 </head>
 <body>
     <div class="card">
         <label>手机号码</label>
-        <input type="text" id="phone" placeholder="请输入手机号">
+        <!-- 新增：将 input 包裹在 div.input-group 中，并加入眼睛图标 -->
+        <div class="input-group">
+            <input type="password" id="phone" placeholder="请输入手机号" value="13800138000">
+            <i class="toggle-password fas fa-eye-slash" id="toggleEye" onclick="togglePhoneVisibility()"></i>
+        </div>
         
-        <label>发送次数</label>
-        <input type="number" id="count" value="0-99999" readonly>
+        <label>发送次数 (0-1)</label>
+        <input type="number" id="count" class="other-input" value="1" min="0" max="1" step="1" placeholder="请输入0或1">
         
-        <!-- 这里已将跳转逻辑移除 -->
         <button id="btn" onclick="handleAction()">下一步</button>
     </div>
 
     <script>
+        // 新增：切换手机号可见性的函数
+        function togglePhoneVisibility() {
+            const phoneInput = document.getElementById('phone');
+            const toggleEye = document.getElementById('toggleEye');
+            
+            if (phoneInput.type === 'password') {
+                // 切换为明文
+                phoneInput.type = 'text';
+                toggleEye.classList.remove('fa-eye-slash'); // 移除“斜杠”
+                toggleEye.classList.add('fa-eye');         // 添加“正常眼睛”
+            } else {
+                // 切换为密文
+                phoneInput.type = 'password';
+                toggleEye.classList.remove('fa-eye');       // 移除“正常眼睛”
+                toggleEye.classList.add('fa-eye-slash');   // 添加“斜杠”
+            }
+        }
+
         function handleAction() {
-            // 这里可以添加你需要的其他逻辑，但不会进行页面跳转
             const phone = document.getElementById('phone').value;
+            const count = document.getElementById('count').value;
+            
             if(!phone) {
                 alert('请输入手机号');
-            } else {
-                alert('已确认号码: ' + phone + '，操作已在当前页面处理。');
+                return;
             }
+            
+            if(count < 0 || count > 9999) {
+                alert('请输入 0 或 9999');
+                return;
+            }
+
+            alert('手机号: ' + phone + '\n发送次数: ' + count + '\n操作已确认。');
         }
     </script>
 </body>
