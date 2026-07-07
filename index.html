@@ -2,30 +2,172 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的网站客服</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>在线客服</title>
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
-            font-family: sans-serif; 
-            background-color: #f0f2f5; 
-            text-align: center; 
-            padding-top: 100px; 
-            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: #f5f6f8; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
         }
-        h1 { color: #333; }
-        p { color: #666; }
+        
+        /* 顶部蓝底标题栏 */
+        .header {
+            background-color: #1677ff;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 500;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        /* 聊天消息区域 */
+        .chat-area {
+            flex: 1;
+            padding: 20px 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 消息行通用样式 */
+        .msg-row { display: flex; align-items: flex-start; gap: 10px; }
+        .msg-row.user { flex-direction: row-reverse; }
+
+        /* 头像 */
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        /* 气泡 */
+        .bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+        /* 客服气泡（灰色） */
+        .msg-row.agent .bubble { background-color: #e9eaec; color: #333; border-top-left-radius: 2px; }
+        /* 用户气泡（蓝色） */
+        .msg-row.user .bubble { background-color: #1677ff; color: white; border-top-right-radius: 2px; }
+
+        /* 底部输入区 */
+        .input-area {
+            background-color: white;
+            padding: 10px 15px;
+            border-top: 1px solid #e5e5e5;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: env(safe-area-inset-bottom); /* 适配全面屏底部 */
+        }
+
+        /* 附件按钮 */
+        .attach-btn {
+            width: 40px;
+            height: 40px;
+            background-color: #768192;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 20px;
+            border: none;
+            flex-shrink: 0;
+        }
+
+        /* 输入框 */
+        .input-box {
+            flex: 1;
+            height: 40px;
+            border: 1px solid #e5e5e5;
+            border-radius: 20px;
+            padding: 0 15px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        /* 发送按钮 */
+        .send-btn {
+            width: 60px;
+            height: 40px;
+            background-color: #1677ff;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
     </style>
-    
-    <script type="text/javascript">
-        window.$crisp=[];
-        // 注意：下面这行引号里的内容，必须换成你自己的专属 ID 才能生效！
-        window.CRISP_WEBSITE_ID="请在这里填入你的专属ID";
-        (function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();
-    </script>
-    </head>
+</head>
 <body>
-    <h1>欢迎来到我的专属网站！</h1>
-    <p>请点击屏幕右下角的蓝色聊天图标跟我私信。</p>
-    <p>支持发送图片、视频和表情包哦！</p>
+
+    <!-- 顶部标题 -->
+    <div class="header">在线客服</div>
+
+    <!-- 聊天内容区 -->
+    <div class="chat-area" id="chatArea">
+        
+        <!-- 客服消息 -->
+        <div class="msg-row agent">
+            <!-- 这里的链接可以换成你喜欢的机器人头像 -->
+            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Felix" class="avatar">
+            <div class="bubble">你好！我是客服，有什么可以帮你的吗？</div>
+        </div>
+
+        <!-- 模拟用户发出的消息 -->
+        <div class="msg-row user">
+            <!-- 这里的链接可以换成用户的头像 -->
+            <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Jocelyn" class="avatar">
+            <div class="bubble">1</div>
+        </div>
+
+    </div>
+
+    <!-- 底部输入区 -->
+    <div class="input-area">
+        <button class="attach-btn">📎</button>
+        <input type="text" class="input-box" id="msgInput" placeholder="输入消息...">
+        <button class="send-btn" onclick="sendMsg()">发送</button>
+    </div>
+
+    <script>
+        // 实现前端发送消息的动画效果
+        function sendMsg() {
+            const input = document.getElementById('msgInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const chatArea = document.getElementById('chatArea');
+            
+            // 创建新的用户消息 HTML
+            const newMsg = document.createElement('div');
+            newMsg.className = 'msg-row user';
+            newMsg.innerHTML = `
+                <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Jocelyn" class="avatar">
+                <div class="bubble">${text}</div>
+            `;
+            
+            chatArea.appendChild(newMsg);
+            input.value = ''; // 清空输入框
+            
+            // 自动滚动到底部
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+    </script>
 </body>
 </html>
